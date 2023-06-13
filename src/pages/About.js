@@ -1,4 +1,3 @@
-import React, { useEffect, useState, useRef } from "react";
 import "./About.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Container, Nav, Form } from "react-bootstrap";
@@ -6,101 +5,7 @@ import ziran from "./foto/ziran.jpg";
 import citra from "./foto/citra.jpg";
 import nasywa from "./foto/nasywa.jpg";
 
-const API_URL = "https://api.themoviedb.org/3/discover/movie";
-const API_KEY = "9c37e727bcf771c5aae268e8767844cd";
-
 function About() {
-  const [setMovies] = useState([]);
-  const [setLatestMovies] = useState([]);
-  const [setPopularMovies] = useState([]);
-  const [currentPage] = useState(1);
-  const [setTotalPages] = useState(0);
-  const [filterByRating] = useState(false);
-  const [filterByLatest] = useState(false);
-  const [setScrollPosition] = useState(0);
-  const [setContainerWidth] = useState(0);
-  const [sortByName] = useState(false);
-  const horizontalScrollRef = useRef(null);
-
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        let url = `${API_URL}?api_key=${API_KEY}&with_original_language=id&region=ID&primary_release_year=2022&page=${currentPage}`;
-
-        if (filterByRating) {
-          url += "&sort_by=vote_average.desc";
-        } else if (filterByLatest) {
-          url += "&sort_by=release_date.desc";
-        } else if (sortByName) {
-          url += "&sort_by=original_title.asc";
-        }
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch movies");
-        }
-
-        const data = await response.json();
-        const sortedMovies = data.results.sort((a, b) =>
-          a.title.localeCompare(b.title, "id", { numeric: true })
-        );
-        setMovies(sortedMovies);
-        setTotalPages(data.total_pages);
-
-        // Set the latestMovies state with the first 5 movies from the results
-        setLatestMovies(sortedMovies.slice(0, 5));
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchMovies();
-  }, [currentPage, filterByRating, filterByLatest, sortByName]);
-
-  useEffect(() => {
-    const fetchPopularMovies = async () => {
-      try {
-        const url = `${API_URL}?api_key=${API_KEY}&with_original_language=id&region=ID&sort_by=popularity.desc&page=1`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch popular movies");
-        }
-
-        const data = await response.json();
-        setPopularMovies(data.results.slice(0, 10)); // Set popularMovies state with the first 10 popular movies
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchPopularMovies();
-  }, []);
-
-  useEffect(() => {
-    const updateContainerWidth = () => {
-      if (horizontalScrollRef.current) {
-        setContainerWidth(horizontalScrollRef.current.offsetWidth);
-      }
-    };
-
-    const handleScroll = () => {
-      if (horizontalScrollRef.current) {
-        setScrollPosition(horizontalScrollRef.current.scrollLeft);
-      }
-    };
-
-    window.addEventListener("resize", updateContainerWidth);
-    window.addEventListener("scroll", handleScroll);
-    updateContainerWidth();
-
-    return () => {
-      window.removeEventListener("resize", updateContainerWidth);
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
     <>
       <Navbar bg="dark" expand="lg" variant="dark">
