@@ -1,19 +1,26 @@
-import React, { useEffect, useState, useRef } from 'react';
-import '../App.css';
-import MovieBox from '../MovieBox';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Navbar, Container, Nav, Form, FormControl, Button, Carousel } from 'react-bootstrap';
+import React, { useEffect, useState, useRef } from "react";
+import "../App.css";
+import MovieBox from "../MovieBox";
+import "bootstrap/dist/css/bootstrap.min.css";
+import {
+  Navbar,
+  Container,
+  Nav,
+  Form,
+  FormControl,
+  Button,
+  Carousel,
+} from "react-bootstrap";
 
 const API_URL = "https://api.themoviedb.org/3/discover/movie";
 const API_IMG = "https://image.tmdb.org/t/p/w500/";
 const API_KEY = "9c37e727bcf771c5aae268e8767844cd";
-const PAGE_SIZE = 20; // Number of movies per page
 
 function Home() {
   const [movies, setMovies] = useState([]);
   const [latestMovies, setLatestMovies] = useState([]);
   const [popularMovies, setPopularMovies] = useState([]);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [filterByRating, setFilterByRating] = useState(false);
@@ -40,12 +47,12 @@ function Home() {
         const response = await fetch(url);
 
         if (!response.ok) {
-          throw new Error('Failed to fetch movies');
+          throw new Error("Failed to fetch movies");
         }
 
         const data = await response.json();
         const sortedMovies = data.results.sort((a, b) =>
-          a.title.localeCompare(b.title, 'id', { numeric: true })
+          a.title.localeCompare(b.title, "id", { numeric: true })
         );
         setMovies(sortedMovies);
         setTotalPages(data.total_pages);
@@ -67,7 +74,7 @@ function Home() {
         const response = await fetch(url);
 
         if (!response.ok) {
-          throw new Error('Failed to fetch popular movies');
+          throw new Error("Failed to fetch popular movies");
         }
 
         const data = await response.json();
@@ -82,7 +89,7 @@ function Home() {
 
   const searchMovie = async (e) => {
     e.preventDefault();
-    console.log('Searching...');
+    console.log("Searching...");
     try {
       let url = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&include_adult=false&region=ID&language=id&query=${query}`;
 
@@ -97,12 +104,13 @@ function Home() {
       const filteredMovies = data.results.filter((movie) => {
         const { title, original_language } = movie;
         const lowerCaseTitle = title.toLowerCase();
-        const isIndonesian = original_language === 'id';
-        const forbiddenWords = ['sex', 'porn', 'explicit']; // Add more forbidden words if needed
+        const isIndonesian = original_language === "id";
+        const forbiddenWords = ["sex", "porn", "explicit"]; // Add more forbidden words if needed
 
         // Check if the title is in Indonesian and does not contain forbidden words
-        return isIndonesian && !forbiddenWords.some((word) =>
-          lowerCaseTitle.includes(word)
+        return (
+          isIndonesian &&
+          !forbiddenWords.some((word) => lowerCaseTitle.includes(word))
         );
       });
 
@@ -118,7 +126,7 @@ function Home() {
     const inputValue = e.target.value;
     setQuery(inputValue);
 
-    if (inputValue === '') {
+    if (inputValue === "") {
       // Reset to the initial state when the input is empty
       setMovies([]);
       setTotalPages(0);
@@ -178,7 +186,11 @@ function Home() {
           <Navbar.Brand href="/home">MoviesZone</Navbar.Brand>
           <Navbar.Toggle aria-controls="navbarScroll" />
           <Navbar.Collapse id="navbarScroll">
-            <Nav className="me-auto my-2 my-lg-3" style={{ maxHeight: '100px' }} navbarScroll></Nav>
+            <Nav
+              className="me-auto my-2 my-lg-3"
+              style={{ maxHeight: "100px" }}
+              navbarScroll
+            ></Nav>
             <Navbar.Brand href="/home">Dashboard</Navbar.Brand>
             <Navbar.Brand href="/about">About Us</Navbar.Brand>
             <Form className="d-flex" onSubmit={searchMovie}>
@@ -202,30 +214,49 @@ function Home() {
         <Carousel className="carousel-container">
           {latestMovies.map((movie) => (
             <Carousel.Item key={movie.id}>
-              <img className="carousel-image" src={API_IMG + movie.poster_path} alt={movie.title} />
+              <img
+                className="carousel-image"
+                src={API_IMG + movie.poster_path}
+                alt={movie.title}
+              />
               <Carousel.Caption>
                 <h2>{movie.title}</h2>
               </Carousel.Caption>
             </Carousel.Item>
           ))}
         </Carousel>
-        <h2 className="section-title" style={{ margin: '20px 0', fontWeight: 'bold' }}>
+        <h2
+          className="section-title"
+          style={{ margin: "20px 0", fontWeight: "bold" }}
+        >
           Popular
         </h2>
 
-        <div className="horizontal-scroll" id="style-2" ref={horizontalScrollRef}>
+        <div
+          className="horizontal-scroll"
+          id="style-2"
+          ref={horizontalScrollRef}
+        >
           {popularMovies.map((movie) => (
             <div key={movie.id} className="popular-movie-card">
-              <img variant="top" src={API_IMG + movie.poster_path} alt={movie.title} />
+              <img
+                variant="top"
+                src={API_IMG + movie.poster_path}
+                alt={movie.title}
+              />
               <div className="card-body">
                 <h6 className="card-title">{movie.title}</h6>
-                <p className="card-text">Rating: {movie.vote_average}</p> {/* Display the rating */}
+                <p className="card-text">Rating: {movie.vote_average}</p>{" "}
+                {/* Display the rating */}
               </div>
             </div>
           ))}
         </div>
 
-        <div className="filter-section" style={{ margin: '20px 0', fontWeight: 'bold' }}>
+        <div
+          className="filter-section"
+          style={{ margin: "20px 0", fontWeight: "bold" }}
+        >
           <Form.Check
             type="switch"
             id="filterRatingSwitch"
@@ -250,7 +281,14 @@ function Home() {
         </div>
 
         <div className="pagination">
-          <Button variant="secondary" onClick={prevPage} disabled={scrollPosition >= horizontalScrollRef.current?.scrollWidth + containerWidth}>
+          <Button
+            variant="secondary"
+            onClick={prevPage}
+            disabled={
+              scrollPosition >=
+              horizontalScrollRef.current?.scrollWidth + containerWidth
+            }
+          >
             Previous
           </Button>
           <span className="page-info">
@@ -259,7 +297,10 @@ function Home() {
           <Button
             variant="secondary"
             onClick={nextPage}
-            disabled={scrollPosition >= horizontalScrollRef.current?.scrollWidth - containerWidth}
+            disabled={
+              scrollPosition >=
+              horizontalScrollRef.current?.scrollWidth - containerWidth
+            }
           >
             Next
           </Button>
@@ -272,7 +313,14 @@ function Home() {
         </div>
 
         <div className="pagination">
-          <Button variant="secondary" onClick={prevPage} disabled={scrollPosition >= horizontalScrollRef.current?.scrollWidth + containerWidth}>
+          <Button
+            variant="secondary"
+            onClick={prevPage}
+            disabled={
+              scrollPosition >=
+              horizontalScrollRef.current?.scrollWidth + containerWidth
+            }
+          >
             Previous
           </Button>
           <span className="page-info">
@@ -281,7 +329,10 @@ function Home() {
           <Button
             variant="secondary"
             onClick={nextPage}
-            disabled={scrollPosition >= horizontalScrollRef.current?.scrollWidth - containerWidth}
+            disabled={
+              scrollPosition >=
+              horizontalScrollRef.current?.scrollWidth - containerWidth
+            }
           >
             Next
           </Button>
